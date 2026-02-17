@@ -44,6 +44,14 @@ struct Weather: Codable {
         return formatTime(timestamp: TimeInterval(sunset))
     }
     
+    // synthesized description since API doesn't provide one
+    var description: String {
+        if wind_speed > 10 { return "Windy" }
+        if cloud_pct < 30 { return "Clear Sky" }
+        if cloud_pct < 70 { return "Partly Cloudy" }
+        return "Cloudy"
+    }
+    
     private func formatTime(timestamp: TimeInterval) -> String {
         let date = Date(timeIntervalSince1970: timestamp)
         let formatter = DateFormatter()

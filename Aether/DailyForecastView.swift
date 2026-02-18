@@ -21,7 +21,7 @@ struct DailyForecastView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("SYSTEM_PROJECTION // 7_DAY_FORECAST")
+            Text("7_DAY_FORECAST")
                 .font(JulesTheme.Fonts.code(size: 12))
                 .foregroundColor(JulesTheme.Colors.neonCyan)
                 .padding(.horizontal)

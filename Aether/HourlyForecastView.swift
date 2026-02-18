@@ -12,7 +12,7 @@ struct HourlyForecastView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("DATA_BUFFER // HOURLY_FORECAST")
+            Text("HOURLY_FORECAST")
                 .font(JulesTheme.Fonts.code(size: 12))
                 .foregroundColor(JulesTheme.Colors.neonCyan)
                 .padding(.horizontal)

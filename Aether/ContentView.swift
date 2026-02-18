@@ -137,54 +137,28 @@ struct ContentView: View {
                     ScrollView {
                         VStack(spacing: 30) {
                             
-                            // Main Stats
-                            VStack(spacing: 5) {
-                                Text(city.uppercased())
-                                    .font(JulesTheme.Fonts.code(size: 16))
-                                    .foregroundColor(JulesTheme.Colors.neonCyan)
-                                    .kerning(2)
-                                
-                                Text(weather.temperatureString)
-                                    .font(JulesTheme.Fonts.title(size: 90))
-                                    .foregroundColor(JulesTheme.Colors.textLight)
-                                    .shadow(color: JulesTheme.Colors.electricPurple.opacity(0.5), radius: 10, x: 0, y: 0)
-                                
-                                Text(weather.description.uppercased())
-                                    .font(JulesTheme.Fonts.code())
-                                    .foregroundColor(JulesTheme.Colors.textDim)
-                                    .padding(.top, -10)
-                            }
-                            .padding(.top, 20)
+                            // Terminal Header (City + Lat/Lon)
+                            TerminalHeaderView(city: city, lat: weather.latitude, lon: weather.longitude)
+                                .padding(.top, 10)
                             
-                            // Hourly Forecast
+                            // Main Terminal Status Box
+                            TerminalMainStatusView(weather: weather)
+                            
+                            // Restore Forecast Views
                             HourlyForecastView(forecast: weather.hourlyForecast)
-                            
-                            // Daily Forecast
                             DailyForecastView(forecast: weather.dailyForecast)
                             
-                            // Astro & Details Grid
-                            VStack(alignment: .leading, spacing: 10) {
-                                Text("TELEMETRY")
-                                    .font(JulesTheme.Fonts.code(size: 12))
-                                    .foregroundColor(JulesTheme.Colors.neonCyan)
-                                    .padding(.horizontal)
-                                
-                                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                                    WeatherDetailView(icon: "thermometer.medium", label: "Feels Like", value: weather.feelsLikeString)
-                                    WeatherDetailView(icon: "humidity", label: "Humidity", value: weather.humidityString)
-                                    WeatherDetailView(icon: "wind", label: "Wind", value: weather.windSpeedString)
-                                    WeatherDetailView(icon: "cloud.fill", label: "Clouds", value: weather.cloudCoverString)
-                                    WeatherDetailView(icon: "sunrise.fill", label: "Sunrise", value: weather.sunriseString)
-                                    WeatherDetailView(icon: "sunset.fill", label: "Sunset", value: weather.sunsetString)
-                                    if let moonPhase = weather.daily.moon_phase?.first {
-                                            WeatherDetailView(icon: "moon.stars.fill", label: "Moon Phase", value: String(format: "%.2f", moonPhase))
-                                    }
-                                }
-                                .padding(.horizontal)
-                            }
-                        }
-                        .padding(.bottom, 50)
+                            // Metrics Grid
+                            TerminalMetricsGrid(weather: weather)
+                            
+                            // System Log Visualization
+                            TerminalSystemLog()
+                                .padding(.top, 20)
+                            
+                            Spacer().frame(height: 50)
                     }
+                    .padding(.bottom, 50)
+                }
                     
                 } else {
                     // Empty State / Welcome
@@ -193,6 +167,10 @@ struct ContentView: View {
                         Text("AETHER_TERMINAL_V1")
                             .font(JulesTheme.Fonts.code())
                             .foregroundColor(JulesTheme.Colors.textDim.opacity(0.3))
+                        Text("WAITING FOR TARGET ACQUISITION...")
+                            .font(JulesTheme.Fonts.code(size: 10))
+                            .foregroundColor(JulesTheme.Colors.neonCyan.opacity(0.5))
+                            .padding(.top, 10)
                         Spacer()
                     }
                 }

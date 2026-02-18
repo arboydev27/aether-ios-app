@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct AetherApp: App {
@@ -13,5 +14,6 @@ struct AetherApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: City.self)
     }
 }

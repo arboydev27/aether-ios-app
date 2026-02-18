@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
+import CoreLocation
 
 struct ContentView: View {
-    @State private var city: String = "London"
+    @State private var city: String = "Loading..."
     @State private var weather: Weather?
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
@@ -16,13 +18,28 @@ struct ContentView: View {
     // Simulate terminal typing effect
     @State private var displayedCity: String = ""
     
+    @StateObject private var locationManager = LocationManager()
+    @Environment(\.modelContext) private var modelContext
+    @Query private var savedCities: [City]
+    
     private let weatherService = WeatherService()
+    
+    // Computes overall loading state
+    private var isBusy: Bool {
+        isLoading || locationManager.isLoading
+    }
     
     var body: some View {
         ZStack {
             // New "Deep Space" Background with Glows
             JulesTheme.backgroundGradient()
-                // .ignoresSafeArea() is handled inside the theme helper, but good to be safe
+            
+            if let weather = weather {
+                WeatherEffectsView(
+                    weatherCode: weather.current.weather_code,
+                    isDay: weather.current.is_day == 1
+                )
+            }
             
             VStack(spacing: 24) {
                 // Header / Search Section
@@ -33,12 +50,12 @@ struct ContentView: View {
                             .font(JulesTheme.Fonts.code())
                             .foregroundColor(JulesTheme.Colors.neonCyan)
                         
-                        TextField("Enter city...", text: $city)
+                        TextField("Enter city... or 'add [city]'", text: $city)
                             .font(JulesTheme.Fonts.body())
                             .foregroundColor(JulesTheme.Colors.textLight)
                             .tint(JulesTheme.Colors.neonCyan) // Cursor color
                             .onSubmit {
-                                Task { await fetchWeather() }
+                                handleInput()
                             }
                     }
                     .padding(12)
@@ -51,9 +68,20 @@ struct ContentView: View {
                             )
                     )
                     
+                    // Location Button
+                    Button(action: {
+                        locationManager.requestLocation()
+                    }) {
+                        Image(systemName: "location.fill")
+                            .foregroundColor(JulesTheme.Colors.textLight)
+                            .padding(12)
+                            .background(JulesTheme.Colors.electricPurple.opacity(0.8))
+                            .clipShape(Rectangle())
+                    }
+                    
                     // Search Button - Sharp & Solid Purple
                     Button(action: {
-                        Task { await fetchWeather() }
+                        handleInput()
                     }) {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(JulesTheme.Colors.textLight)
@@ -66,41 +94,63 @@ struct ContentView: View {
                 .padding(.top, 20)
                 
                 // Saved Cities "Tabs"
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(["London", "Norman, OK", "New York", "Mountain View, CA", "Tokyo", "Paris"], id: \.self) { savedCity in
-                            Button(action: {
-                                city = savedCity
-                                Task { await fetchWeather() }
-                            }) {
-                                Text(savedCity)
+                if !savedCities.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(savedCities) { savedCity in
+                                Button(action: {
+                                    city = savedCity.name
+                                    Task { await fetchWeather(lat: savedCity.latitude, lon: savedCity.longitude) }
+                                }) {
+                                    HStack(spacing: 4) {
+                                        Text(savedCity.name)
+                                        if savedCity.isCurrentLocation {
+                                            Image(systemName: "location.fill").font(.caption)
+                                        }
+                                    }
                                     .font(JulesTheme.Fonts.code(size: 12))
                                     .padding(.vertical, 8)
                                     .padding(.horizontal, 16)
-                                    .background(city == savedCity ? JulesTheme.Colors.neonCyan.opacity(0.1) : Color.clear)
+                                    .background(city == savedCity.name ? JulesTheme.Colors.neonCyan.opacity(0.1) : Color.clear)
                                     .overlay(
                                         Rectangle()
                                             .stroke(
-                                                city == savedCity ? JulesTheme.Colors.neonCyan : JulesTheme.Colors.textDim.opacity(0.5),
+                                                city == savedCity.name ? JulesTheme.Colors.neonCyan : JulesTheme.Colors.textDim.opacity(0.5),
                                                 lineWidth: 1
                                             )
                                     )
-                                    .foregroundColor(city == savedCity ? JulesTheme.Colors.neonCyan : JulesTheme.Colors.textDim)
+                                    .foregroundColor(city == savedCity.name ? JulesTheme.Colors.neonCyan : JulesTheme.Colors.textDim)
+                                }
+                                .contextMenu {
+                                    Button("Delete", role: .destructive) {
+                                        modelContext.delete(savedCity)
+                                    }
+                                }
                             }
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                 }
                 
-                if isLoading {
+                if isBusy {
                     // Loading State - Minimal terminal loader
                     VStack(spacing: 15) {
                         ProgressView()
                             .tint(JulesTheme.Colors.neonCyan)
                             .scaleEffect(1.2)
-                        Text("EXECUTING REQUEST...")
+                        Text("ACQUIRING TARGET...")
                             .font(JulesTheme.Fonts.code())
                             .foregroundColor(JulesTheme.Colors.neonCyan)
+                        
+                        // Fallback button if stuck
+                        Button("Override: Load London") {
+                            locationManager.stopUpdating() // Stop trying
+                            self.city = "London"
+                            Task { await fetchWeather() }
+                        }
+                        .font(JulesTheme.Fonts.code(size: 10))
+                        .foregroundColor(JulesTheme.Colors.textDim)
+                        .padding(.top, 20)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     
@@ -133,7 +183,6 @@ struct ContentView: View {
                                 Text(weather.temperatureString)
                                     .font(JulesTheme.Fonts.title(size: 90))
                                     .foregroundColor(JulesTheme.Colors.textLight)
-                                    // Make it look like a digital readout
                                     .shadow(color: JulesTheme.Colors.electricPurple.opacity(0.5), radius: 10, x: 0, y: 0)
                                 
                                 Text(weather.description.uppercased())
@@ -143,16 +192,32 @@ struct ContentView: View {
                             }
                             .padding(.top, 20)
                             
-                            // Data Grid
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
-                                WeatherDetailView(icon: "thermometer.medium", label: "Feels Like", value: weather.feelsLikeString)
-                                WeatherDetailView(icon: "humidity", label: "Humidity", value: weather.humidityString)
-                                WeatherDetailView(icon: "wind", label: "Wind", value: weather.windSpeedString)
-                                WeatherDetailView(icon: "cloud.fill", label: "Clouds", value: "\(weather.cloud_pct)%")
-                                WeatherDetailView(icon: "sunrise.fill", label: "Sunrise", value: weather.sunriseString)
-                                WeatherDetailView(icon: "sunset.fill", label: "Sunset", value: weather.sunsetString)
+                            // Hourly Forecast
+                            HourlyForecastView(forecast: weather.hourlyForecast)
+                            
+                            // Daily Forecast
+                            DailyForecastView(forecast: weather.dailyForecast)
+                            
+                            // Astro & Details Grid
+                            VStack(alignment: .leading, spacing: 10) {
+                                Text("SYSTEM_METRICS // TELEMETRY")
+                                    .font(JulesTheme.Fonts.code(size: 12))
+                                    .foregroundColor(JulesTheme.Colors.neonCyan)
+                                    .padding(.horizontal)
+                                
+                                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+                                    WeatherDetailView(icon: "thermometer.medium", label: "Feels Like", value: weather.feelsLikeString)
+                                    WeatherDetailView(icon: "humidity", label: "Humidity", value: weather.humidityString)
+                                    WeatherDetailView(icon: "wind", label: "Wind", value: weather.windSpeedString)
+                                    WeatherDetailView(icon: "cloud.fill", label: "Clouds", value: weather.cloudCoverString)
+                                    WeatherDetailView(icon: "sunrise.fill", label: "Sunrise", value: weather.sunriseString)
+                                    WeatherDetailView(icon: "sunset.fill", label: "Sunset", value: weather.sunsetString)
+                                    if let moonPhase = weather.daily.moon_phase?.first {
+                                            WeatherDetailView(icon: "moon.stars.fill", label: "Moon Phase", value: String(format: "%.2f", moonPhase))
+                                    }
+                                }
+                                .padding(.horizontal)
                             }
-                            .padding(.horizontal)
                         }
                         .padding(.bottom, 50)
                     }
@@ -170,17 +235,100 @@ struct ContentView: View {
             }
         }
         .task {
-            // Load initial weather
-            await fetchWeather()
+            // Request location immediately on launch
+            locationManager.requestLocation()
+            
+            // Timeout after 5 seconds if no location found
+            try? await Task.sleep(nanoseconds: 5 * 1_000_000_000)
+            if city == "Loading..." || city == "Acquiring Target..." {
+                print("Location timeout. Defaulting to Norman, OK.")
+                locationManager.stopUpdating()
+                // Default to Norman, OK
+                self.city = "Norman"
+                await fetchWeather(lat: 35.2226, lon: -97.4395)
+            }
+        }
+        .onChange(of: locationManager.location) { newLocation in
+            guard let location = newLocation else { return }
+            // Only update if we haven't set a manual city yet (or are still loading)
+            if city == "Loading..." || city == "Acquiring Target..." {
+                 Task {
+                    // Reverse geocode for UI
+                    if let cityName = await locationManager.getCityName(from: location) {
+                        self.city = cityName
+                    } else {
+                        self.city = "Current Location"
+                    }
+                    // Fetch weather by coords
+                    await fetchWeather(lat: location.coordinate.latitude, lon: location.coordinate.longitude)
+                }
+            }
+        }
+        .onChange(of: locationManager.permissionError) { hasError in
+             if hasError {
+                 errorMessage = "Location permission denied. Please enable it in settings."
+             }
         }
         .preferredColorScheme(.dark) // Force dark mode for status bar
     }
     
+    private func handleInput() {
+        let input = city.trimmingCharacters(in: .whitespacesAndNewlines)
+        if input.lowercased().starts(with: "add ") {
+            let cityName = String(input.dropFirst(4)).trimmingCharacters(in: .whitespaces)
+            Task {
+                 await addCity(name: cityName)
+            }
+        } else {
+            Task { await fetchWeather() }
+        }
+    }
+    
+    private func addCity(name: String) async {
+        isLoading = true
+        // 1. Fetch coords to verify city exists
+        // We can reuse WeatherService private method if exposed or just use fetchWeather to get coords then save
+        // A better way is to add a public geocode method to service
+        // For now, I'll allow "saving" after a successful fetch, OR implement a standalone add:
+        
+        do {
+            // I'll assume WeatherService processes it. 
+            // Better behavior: user searches, sees weather, then clicks "Save"?
+            // User requested "command line style input (> add city Tokyo)".
+            // So we blindly try to add it.
+            
+            // We need coordinates to save.
+            // I will use fetchWeather to get the weather object which contains lat/lon, then save.
+            let weather = try await weatherService.fetchWeather(for: name)
+            
+            // Save to SwiftData
+            let newCity = City(name: name, latitude: weather.latitude, longitude: weather.longitude)
+            modelContext.insert(newCity)
+            
+            self.city = name
+            self.weather = weather // Show it
+        } catch {
+            errorMessage = "Could not find city: \(name)"
+        }
+        isLoading = false
+    }
+
     private func fetchWeather() async {
         isLoading = true
         errorMessage = nil
         do {
             weather = try await weatherService.fetchWeather(for: city)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+    
+    private func fetchWeather(lat: Double, lon: Double) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            weather = try await weatherService.fetchWeather(lat: lat, lon: lon)
         } catch {
             errorMessage = error.localizedDescription
         }

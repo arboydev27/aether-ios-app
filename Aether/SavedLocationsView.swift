@@ -32,7 +32,7 @@ struct SavedLocationsView: View {
                         .frame(width: 40, height: 4)
                         .padding(.top, 10)
                     
-                    Text("SAVED_LOCATIONS // DATABASE")
+                    Text("SAVED_LOCATIONS")
                         .font(JulesTheme.Fonts.code(size: 14))
                         .foregroundColor(JulesTheme.Colors.neonCyan)
                         .padding(.bottom, 10)

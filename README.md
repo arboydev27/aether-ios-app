@@ -4,7 +4,7 @@
 
 ---
 
-## 📸 Product Showcase
+## Product Showcase
 
 Aether's design is its core feature. Here's a look at the futuristic interface.
 
@@ -20,7 +20,7 @@ Aether's design is its core feature. Here's a look at the futuristic interface.
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 -   **Language**: Swift 6
 -   **UI Framework**: SwiftUI
@@ -62,7 +62,7 @@ The visual identity is centralized in `JulesTheme.swift`, ensuring consistency a
 
 ---
 
-## 🚀 Setup & Run
+## Setup & Run
 
 1.  **Clone the Repository**
     ```bash

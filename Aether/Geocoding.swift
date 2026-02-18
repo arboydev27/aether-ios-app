@@ -16,5 +16,6 @@ struct Geocoding: Codable {
     let latitude: Double
     let longitude: Double
     let country: String?
+    let country_code: String?
     let admin1: String? // State/Region
 }

@@ -34,7 +34,7 @@ class WeatherService {
         return try await fetchWeather(lat: location.latitude, lon: location.longitude)
     }
 
-    private func fetchCoordinates(for city: String) async throws -> [Geocoding] {
+    func fetchCoordinates(for city: String) async throws -> [Geocoding] {
         var components = URLComponents(string: geocodingUrl)
         var queryItems = [
             URLQueryItem(name: "name", value: city),

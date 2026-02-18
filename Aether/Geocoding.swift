@@ -7,9 +7,14 @@
 
 import Foundation
 
+struct GeocodingResponse: Codable {
+    let results: [Geocoding]?
+}
+
 struct Geocoding: Codable {
     let name: String
     let latitude: Double
     let longitude: Double
-    let country: String
+    let country: String?
+    let admin1: String? // State/Region
 }

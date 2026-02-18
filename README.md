@@ -1,6 +1,6 @@
-# Aether
+# Aether iOS App ⛈️
 
-**Aether** is a next-generation weather client that prioritizes aesthetics, privacy, and performance. Built entirely in Swift 6, it delivers a futuristic "Jules Verne" inspired interface while maintaining robust architectural principles.
+**Aether** is a next-generation weather client that prioritizes aesthetics, privacy, and performance. Built entirely in Swift 6 and SwiftUI, it delivers a futuristic "Jules Verne" inspired interface while maintaining robust architectural principles.
 
 ---
 

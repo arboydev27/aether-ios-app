@@ -96,28 +96,40 @@ struct TerminalMainStatusView: View {
                 
                 Spacer()
                 
-                // Right Side: Decorative Grid (4x4)
-                VStack(spacing: 2) {
-                    ForEach(0..<4) { row in
-                        HStack(spacing: 2) {
-                            ForEach(0..<4) { col in
-                                Rectangle()
-                                    .fill(opacity(row: row, col: col))
-                                    .frame(width: 12, height: 12)
-                            }
-                        }
-                    }
-                }
+                // Right Side: 8x8 Pixel Art Grid
+                WeatherPixelGrid(code: weather.current.weather_code, isDay: weather.current.is_day == 1)
             }
             .padding(.vertical, 10)
         }
         .padding(.horizontal)
     }
+}
+
+struct WeatherPixelGrid: View {
+    let code: Int
+    let isDay: Bool
     
-    // Generate random-ish opacity for the grid to look "active"
-    func opacity(row: Int, col: Int) -> Color {
-        let active = (row + col) % 3 == 0
-        return active ? JulesTheme.Colors.neonCyan.opacity(0.8) : JulesTheme.Colors.neonCyan.opacity(0.1)
+    var body: some View {
+        let pattern = WeatherPixelArt.getPattern(for: code, isDay: isDay)
+        
+        VStack(spacing: 2) {
+            ForEach(0..<8, id: \.self) { row in
+                HStack(spacing: 2) {
+                    ForEach(0..<8, id: \.self) { col in
+                        let isActive = pattern[row][col] == 1
+                        Rectangle()
+                            .fill(isActive ? JulesTheme.Colors.neonCyan : JulesTheme.Colors.orbit.opacity(0.3))
+                            .frame(width: 6, height: 6) // Smaller for 8x8 fit
+                    }
+                }
+            }
+        }
+        .padding(8)
+        .background(JulesTheme.Colors.orbit.opacity(0.2))
+        .overlay(
+            Rectangle()
+                .stroke(JulesTheme.Colors.neonCyan.opacity(0.3), lineWidth: 1)
+        )
     }
 }
 

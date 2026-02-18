@@ -17,6 +17,7 @@ struct JulesTheme {
         // Accents
         static let neonCyan = Color(hex: "22d3ee") // Tailwind Cyan-400
         static let electricPurple = Color(hex: "a855f7") // Tailwind Purple-500
+        static let sunYellow = Color(hex: "facc15") // Neon Yellow for Sun
         
         // Text
         static let textLight = Color(hex: "ffffff") // Pure White

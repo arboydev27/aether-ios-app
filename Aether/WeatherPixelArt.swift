@@ -5,99 +5,126 @@
 //  Created by Arboy Magomba on 2/17/26.
 //
 
-import Foundation
+import SwiftUI
 
 struct WeatherPixelArt {
-    // 8x8 Grids (0 = Off, 1 = On)
     
-    // ☀️ Clear / Sunny
-    static let clear: [[Int]] = [
+    // MARK: - Patterns (8x8 Grid)
+    
+    static let sun: [[Int]] = [
         [0, 0, 1, 0, 0, 1, 0, 0],
         [0, 0, 0, 1, 1, 0, 0, 0],
-        [1, 0, 0, 1, 1, 0, 0, 1],
+        [1, 0, 1, 1, 1, 1, 0, 1],
         [0, 1, 1, 1, 1, 1, 1, 0],
         [0, 1, 1, 1, 1, 1, 1, 0],
-        [1, 0, 0, 1, 1, 0, 0, 1],
+        [1, 0, 1, 1, 1, 1, 0, 1],
         [0, 0, 0, 1, 1, 0, 0, 0],
         [0, 0, 1, 0, 0, 1, 0, 0]
     ]
     
-    // 🌙 Clear Night
-    static let clearNight: [[Int]] = [
-        [0, 0, 0, 1, 1, 0, 0, 0],
+    static let moon: [[Int]] = [
+        [0, 0, 0, 1, 1, 1, 0, 0],
         [0, 0, 1, 1, 1, 0, 0, 0],
         [0, 1, 1, 1, 0, 0, 0, 0],
         [0, 1, 1, 1, 0, 0, 0, 0],
         [0, 1, 1, 1, 0, 0, 0, 0],
         [0, 0, 1, 1, 1, 0, 0, 0],
-        [0, 0, 0, 1, 1, 0, 0, 0],
+        [0, 0, 0, 1, 1, 1, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0]
     ]
     
-    // ☁️ Cloudy
-    static let cloudy: [[Int]] = [
+    static let cloud: [[Int]] = [
         [0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 1, 1, 0, 0, 0],
-        [0, 1, 1, 1, 1, 1, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 1, 1, 1, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
         [1, 1, 1, 1, 1, 1, 1, 1],
         [0, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0]
+    ]
+    
+    static let rain: [[Int]] = [
+        [0, 0, 0, 1, 1, 1, 0, 0],
+        [0, 0, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 1, 0, 1, 0, 1, 0],
+        [0, 0, 1, 0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 0],
+        [0, 1, 0, 1, 0, 1, 0, 0],
+        [1, 0, 1, 0, 1, 0, 0, 0]
+    ]
+    
+    static let snow: [[Int]] = [
+        [1, 0, 0, 1, 0, 0, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 1, 0, 1, 0, 1, 0, 0],
+        [1, 0, 0, 1, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0]
+    ]
+    
+    static let thunder: [[Int]] = [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 1, 1, 1, 0, 0],
+        [0, 0, 1, 1, 1, 0, 0, 0],
+        [0, 0, 0, 1, 1, 0, 0, 0],
+        [0, 0, 1, 1, 0, 0, 0, 0],
+        [0, 1, 1, 0, 0, 0, 0, 0]
+    ]
+    
+    static let fog: [[Int]] = [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 1, 1, 1, 1, 1, 1, 1],
         [0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0]
     ]
     
-    // 🌧️ Rain
-    static let rain: [[Int]] = [
-        [0, 0, 1, 1, 1, 0, 0, 0],
-        [0, 1, 1, 1, 1, 1, 0, 0],
-        [1, 1, 1, 1, 1, 1, 1, 0],
-        [0, 0, 1, 0, 1, 0, 0, 0],
-        [0, 1, 0, 0, 0, 1, 0, 0],
-        [0, 0, 1, 0, 1, 0, 0, 0],
-        [0, 1, 0, 0, 0, 1, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0]
-    ]
-    
-    // 🌨️ Snow
-    static let snow: [[Int]] = [
-        [1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 1, 0, 1, 0, 1, 0, 1],
-        [1, 0, 1, 0, 1, 0, 1, 0],
-        [0, 1, 0, 1, 0, 1, 0, 1]
-    ]
-    
-    // ⚡️ Thunder
-    static let thunder: [[Int]] = [
-        [0, 0, 0, 1, 1, 0, 0, 0],
-        [0, 0, 1, 1, 0, 0, 0, 0],
-        [0, 1, 1, 1, 1, 1, 0, 0],
-        [0, 0, 0, 1, 1, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0]
-    ]
+    // MARK: - Helpers
     
     static func getPattern(for code: Int, isDay: Bool) -> [[Int]] {
         switch code {
-        case 0: // Clear
-            return isDay ? clear : clearNight
-        case 1, 2, 3: // Cloudy
-            return cloudy
+        case 0, 1: // Clear / Mainly Clear
+            return isDay ? sun : moon
+        case 2, 3: // Partly Cloudy / Overcast
+            return cloud
         case 45, 48: // Fog
-            return cloudy // Todo: specialized fog
-        case 51...67, 80...82: // Rain
+            return fog
+        case 51...67, 80...82: // Drizzle / Rain / Showers
             return rain
-        case 71...77, 85...86: // Snow
+        case 71...77, 85, 86: // Snow
             return snow
-        case 95...99: // Thunder
+        case 95...99: // Thunderstorm
             return thunder
         default:
-            return clear // Fallback
+            return cloud
+        }
+    }
+    
+    static func getColor(for code: Int, isDay: Bool) -> Color {
+        switch code {
+        case 0, 1: // Clear
+            return isDay ? JulesTheme.Colors.sunYellow : JulesTheme.Colors.textLight
+        case 2, 3: // Cloudy
+            return JulesTheme.Colors.textLight
+        case 45, 48: // Fog
+            return JulesTheme.Colors.textDim
+        case 51...67, 80...82: // Rain
+            return JulesTheme.Colors.neonCyan
+        case 71...77, 85, 86: // Snow
+            return JulesTheme.Colors.textLight
+        case 95...99: // Thunder
+            return JulesTheme.Colors.sunYellow
+        default:
+            return JulesTheme.Colors.textLight
         }
     }
 }

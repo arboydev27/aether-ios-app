@@ -111,6 +111,7 @@ struct WeatherPixelGrid: View {
     
     var body: some View {
         let pattern = WeatherPixelArt.getPattern(for: code, isDay: isDay)
+        let activeColor = WeatherPixelArt.getColor(for: code, isDay: isDay)
         
         VStack(spacing: 2) {
             ForEach(0..<8, id: \.self) { row in
@@ -118,7 +119,7 @@ struct WeatherPixelGrid: View {
                     ForEach(0..<8, id: \.self) { col in
                         let isActive = pattern[row][col] == 1
                         Rectangle()
-                            .fill(isActive ? JulesTheme.Colors.neonCyan : JulesTheme.Colors.orbit.opacity(0.3))
+                            .fill(isActive ? activeColor : JulesTheme.Colors.orbit.opacity(0.3))
                             .frame(width: 6, height: 6) // Smaller for 8x8 fit
                     }
                 }
@@ -128,7 +129,7 @@ struct WeatherPixelGrid: View {
         .background(JulesTheme.Colors.orbit.opacity(0.2))
         .overlay(
             Rectangle()
-                .stroke(JulesTheme.Colors.neonCyan.opacity(0.3), lineWidth: 1)
+                .stroke(activeColor.opacity(0.3), lineWidth: 1)
         )
     }
 }

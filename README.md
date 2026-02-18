@@ -31,7 +31,7 @@ Aether's design is its core feature. Here's a look at the futuristic interface.
 
 ---
 
-## 🏗 Architecture & Design Decisions
+## Architecture & Design Decisions
 
 ### 1. Privacy-First API Strategy (Open-Meteo)
 Aether is built on the philosophy that weather data should be free and private.

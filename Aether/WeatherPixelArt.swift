@@ -110,21 +110,11 @@ struct WeatherPixelArt {
     }
     
     static func getColor(for code: Int, isDay: Bool) -> Color {
-        switch code {
-        case 0, 1: // Clear
-            return isDay ? JulesTheme.Colors.sunYellow : JulesTheme.Colors.textLight
-        case 2, 3: // Cloudy
-            return JulesTheme.Colors.textLight
-        case 45, 48: // Fog
-            return JulesTheme.Colors.textDim
-        case 51...67, 80...82: // Rain
-            return JulesTheme.Colors.neonCyan
-        case 71...77, 85, 86: // Snow
-            return JulesTheme.Colors.textLight
-        case 95...99: // Thunder
+        // Only the Sun (Clear Day) gets Yellow.
+        if (code == 0 || code == 1) && isDay {
             return JulesTheme.Colors.sunYellow
-        default:
-            return JulesTheme.Colors.textLight
         }
+        // Everything else is Neon Cyan
+        return JulesTheme.Colors.neonCyan
     }
 }

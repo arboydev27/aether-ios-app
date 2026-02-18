@@ -155,9 +155,9 @@ struct ContentView: View {
                             TerminalSystemLog()
                                 .padding(.top, 20)
                             
-                            Spacer().frame(height: 50)
                     }
-                    .padding(.bottom, 50)
+
+
                 }
                     
                 } else {

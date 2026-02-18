@@ -10,9 +10,22 @@
 		A01DF1BF2F45167500A647F5 /* Aether.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Aether.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A01DF1F02F45479200A647F5 /* Exceptions for "Aether" folder in "Aether" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A01DF1BE2F45167500A647F5 /* Aether */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A01DF1C12F45167500A647F5 /* Aether */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A01DF1F02F45479200A647F5 /* Exceptions for "Aether" folder in "Aether" target */,
+			);
 			path = Aether;
 			sourceTree = "<group>";
 		};

@@ -38,6 +38,20 @@ struct JulesTheme {
         }
     }
     
+    // Glassmorphism Helper
+    static func glassMaterial() -> some View {
+        // "Liquid Glass"
+        // Uses UltraThinMaterial with a tint + overlay border
+        Rectangle()
+            .fill(.ultraThinMaterial)
+            .overlay(Rectangle().fill(Colors.deepspace.opacity(0.3))) // Darken
+            .overlay(
+                Rectangle()
+                    .stroke(Colors.neonCyan.opacity(0.1), lineWidth: 1) // Subtle border
+            )
+            .shadow(color: Colors.electricPurple.opacity(0.1), radius: 10, x: 0, y: 5)
+    }
+
     // Gradient Background (Deep Space with Glows)
     static func backgroundGradient() -> some View {
         ZStack {

@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var weather: Weather?
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
+    @State private var showSavedLocations: Bool = false
     
     // Simulate terminal typing effect
     @State private var displayedCity: String = ""
@@ -93,44 +94,7 @@ struct ContentView: View {
                 .padding(.horizontal)
                 .padding(.top, 20)
                 
-                // Saved Cities "Tabs"
-                if !savedCities.isEmpty {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(savedCities) { savedCity in
-                                Button(action: {
-                                    city = savedCity.name
-                                    Task { await fetchWeather(lat: savedCity.latitude, lon: savedCity.longitude) }
-                                }) {
-                                    HStack(spacing: 4) {
-                                        Text(savedCity.name)
-                                        if savedCity.isCurrentLocation {
-                                            Image(systemName: "location.fill").font(.caption)
-                                        }
-                                    }
-                                    .font(JulesTheme.Fonts.code(size: 12))
-                                    .padding(.vertical, 8)
-                                    .padding(.horizontal, 16)
-                                    .background(city == savedCity.name ? JulesTheme.Colors.neonCyan.opacity(0.1) : Color.clear)
-                                    .overlay(
-                                        Rectangle()
-                                            .stroke(
-                                                city == savedCity.name ? JulesTheme.Colors.neonCyan : JulesTheme.Colors.textDim.opacity(0.5),
-                                                lineWidth: 1
-                                            )
-                                    )
-                                    .foregroundColor(city == savedCity.name ? JulesTheme.Colors.neonCyan : JulesTheme.Colors.textDim)
-                                }
-                                .contextMenu {
-                                    Button("Delete", role: .destructive) {
-                                        modelContext.delete(savedCity)
-                                    }
-                                }
-                            }
-                        }
-                        .padding(.horizontal)
-                    }
-                }
+                // Saved Cities "Tabs" - REMOVED (Replaced by FAB Sheet)
                 
                 if isBusy {
                     // Loading State - Minimal terminal loader
@@ -200,7 +164,7 @@ struct ContentView: View {
                             
                             // Astro & Details Grid
                             VStack(alignment: .leading, spacing: 10) {
-                                Text("SYSTEM_METRICS // TELEMETRY")
+                                Text("TELEMETRY")
                                     .font(JulesTheme.Fonts.code(size: 12))
                                     .foregroundColor(JulesTheme.Colors.neonCyan)
                                     .padding(.horizontal)
@@ -233,6 +197,36 @@ struct ContentView: View {
                     }
                 }
             }
+            
+            // FAB for Saved Locations
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        showSavedLocations = true
+                    }) {
+                        Image(systemName: "list.bullet")
+                            .font(.system(size: 22, weight: .semibold))
+                            .foregroundColor(.primary)
+                            .padding(18)
+                            .glassEffect(in: Circle()) // Apple's Liquid Glass
+                            .overlay(
+                                Circle().stroke(.white.opacity(0.1), lineWidth: 0.5)
+                            )
+                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                    }
+                    .padding(25)
+                }
+            }
+        }
+        .sheet(isPresented: $showSavedLocations) {
+            SavedLocationsView(onSelectCity: { selectedCity in
+                self.city = selectedCity.name
+                Task {
+                    await fetchWeather(lat: selectedCity.latitude, lon: selectedCity.longitude)
+                }
+            })
         }
         .task {
             // Request location immediately on launch
